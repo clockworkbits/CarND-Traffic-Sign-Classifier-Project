@@ -28,6 +28,10 @@ The goals / steps of this project are the following:
 [sign5]: ./signs-photos/5.png "Stop sign"
 [sign6]: ./signs-photos/6.png "No entry"
 [sign7]: ./signs-photos/7.png "Speed limit (50km/h) covered by leaves"
+[sign8]: ./signs-photos/8.png "Rotated priority road"
+[sign9]: ./signs-photos/9.png "Blurred Road work"
+[sign10]: ./signs-photos/off.png "Yield off the screen"
+
 
 ## Rubric Points
 ###Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/481/view) individually and describe how I addressed each point in my implementation.  
@@ -98,8 +102,8 @@ To train the model, I used the Adam Optimizer. The batch size was 128, 30 epochs
 
 My final model results were:
 * training set accuracy of 1.000
-* validation set accuracy of 0.949
-* test set accuracy of 0.950
+* validation set accuracy of 0.966
+* test set accuracy of 0.955
 
 ![Accuracy during training][accuracy]
 
@@ -110,23 +114,48 @@ Then I experimented with expanding single layers over the original hand written 
 
 ####1. Choose five German traffic signs found on the web and provide them in the report. For each image, discuss what quality or qualities might be difficult to classify.
 
-Here are five traffic signs that I found on the web:
+Here are some traffic signs that I found on the web with a short description below the pictures:
 
 ![sign1]
 
+This sign (Speed limit (50km/h)) seems to be clear and should be easily clasified by the model.
+
 ![sign2]
+
+This is the Australian Stop sign for the cases when the traffic lights is not working. It has three black dots representing the traffic lights in it. It is quite similar to the standard Stop sign.
 
 ![sign3] 
 
+No entry sign that is slightly skewed and a bit darker. It shouldn't be a problem to classify it. 
+
 ![sign4]
+
+Another No entry sign. It is very bright. Shouldn't be a problem for the model.
 
 ![sign5]
 
+A very clean stop sign. Good contrast ratio.
+
 ![sign6]
+
+Another No entry sign. From the image, it seems quite old, but after resizing the pattern will be gone. Should be easy for the model.
 
 ![sign7]
 
-I was curious how the model will perform with a sign that was not included in the original training set, but is quite similar so I added sign 2, which is Australian Stop sign for the cases when the traffic lights is not working. The last sign is the speed limit covered by the leaves.
+The 50 km/h speed limit covered by the leaves. The fact the full sign is not visible can be an issue for the model.
+
+![sign8]
+
+The priority road sign that is 45 degrees rotated. The model wasn't trained on the rotated samples, so it can be difficult to recognize.
+
+![sign9]
+
+The road work sign with the gaussian blur applied on it. The blur can cause some problems for the model.
+
+![sign10]
+
+The yield sign that is placed a bit off the screen. Again the model wasn't trained on such examples, so it might be hard to classify.
+
 
 ####2. Discuss the model's predictions on these new traffic signs and compare the results to predicting on the test set. At a minimum, discuss what the predictions were, the accuracy on these new predictions, and compare the accuracy to the accuracy on the test set (OPTIONAL: Discuss the results in more detail as described in the "Stand Out Suggestions" part of the rubric).
 
@@ -135,42 +164,45 @@ Here are the results of the prediction:
 | Image			        |     Prediction	        					| 
 |:---------------------:|:---------------------------------------------:| 
 | Speed limit (50km/h)  | Speed limit (50km/h)   						|
-| Australian Stop       | Stop                                          |
+| Australian Stop       | Speed limit (30km/h)                          |
 | No Entry #1     		| No Entry										|
 | No Entry #2           | No Entry                                      |
 | Stop					| Stop											|
 | No Entry #3           | No Entry                                      |
 | 50 km/h covered  		| 30 km/h   					 				|
+| Priority road         | Right-of-way at the next intersection         |
+| Road work             | Road work                                     |
+| Yield                 | Priority road                                 |
 
-The model was able to correctly guess 6 of the 7 traffic signs, which gives an accuracy of 85.7%. This is a lower result than the test set, which had the accuracy of 95%.
+The model was able to correctly guess 6 of the 10 traffic signs, which gives an accuracy of 60%. This is a lower result than the test set, which had the accuracy of 95%.
 
 ####3. Describe how certain the model is when predicting on each of the five new images by looking at the softmax probabilities for each prediction. Provide the top 5 softmax probabilities for each image along with the sign type of each probability. (OPTIONAL: as described in the "Stand Out Suggestions" part of the rubric, visualizations can also be provided such as bar charts)
 
-In general the predictions were very strong (>0.99), if the image was clear or from the test set. The one that was recognized incorrectly, was the 50 km/h speed limit covered by leaves, and the model clasified it as the 30 km/h speed limit with very high probability (>0.98).
+In general the predictions were very strong (>0.99), if the image was clear or from the test set. The incorrectly recognized were the signes out of the set (Australian Stop sign), covered (50 km/h speed limit covered by leaves), rotated (priority road) and off the screen (yield). Blur on the Road work sign did not change the result.
 
 For the first image, the prediction is very strong.
 
 | Probability         	|     Prediction	        					| 
 |:---------------------:|:---------------------------------------------:| 
-|0.9995915293693542     | Speed limit (50km/h)                          |
-|0.0004084741813130677  | Speed limit (30km/h)                          |
-|2.6031414979317546e-13 | Speed limit (70km/h)                          |
-|6.972745406237657e-14  | Speed limit (80km/h)                          |
-|5.380127970195346e-15  | Speed limit (100km/h)                         |
+|1.0 | Speed limit (50km/h)|
+|4.309674395130969e-09 | Speed limit (30km/h)|
+|1.422185358360589e-17 | Speed limit (80km/h)|
+|9.533787764723268e-20 | Speed limit (60km/h)|
+|1.628669148760936e-21 | Speed limit (100km/h)|
 
 
-For the second image, the Australian stop sign, the prediction it is the Stop sign is very high.
+For the second image, the Australian stop sign, the prediction it is the Speed limit (30km/h) sign. The one that could be found as a correct is the second one with the probability of 17.9%. Quite interesting thing is that in the previous run of the same model the result here was different. It returned probability of 99% it was the stop sign. 
 
 | Probability         	|     Prediction	        					| 
 |:---------------------:|:---------------------------------------------:| 
-|0.9936254024505615     | Stop                                          |
-|0.004622188396751881   | No vehicles                                   |
-|0.0007988493307493627  | Children crossing                             |
-|0.0003835259412880987  | Yield                                         |
-|0.0003486303612589836  | Right-of-way at the next intersection         |
+|0.7730767726898193 | Speed limit (30km/h)|
+|0.17958398163318634 | Stop|
+|0.033604711294174194 | Speed limit (50km/h)|
+|0.009632924571633339 | Right-of-way at the next intersection|
+|0.003424845403060317 | Speed limit (80km/h)|
 
 
-The probability table for the third image
+The probability table for the third image. Versy strong probability.
 
 | Probability         	|     Prediction	        					| 
 |:---------------------:|:---------------------------------------------:| 
@@ -181,48 +213,75 @@ The probability table for the third image
 |2.2339378610847227e-12 | Yield|
 
 
-The probability table for the forth image
+The probability table for the forth image. The model was certain.
 
 | Probability         	|     Prediction	        					| 
 |:---------------------:|:---------------------------------------------:|
 |1.0 | No entry|
-|4.675549010457747e-12 | Stop|
-|2.9800301434163874e-24 | Yield|
-|4.246246892405432e-26 | No passing|
-|3.7646506994047066e-26 | Bicycles crossing|
+|5.165698191466131e-15 | Stop|
+|4.705655414910278e-34 | Speed limit (20km/h)|
+|4.3551230568922565e-35 | Bumpy road|
+|3.720845418451188e-35 | Traffic signals|
 
 
-The probability table for the fifth image
+The probability table for the fifth image. This was the strongest result.
 
 | Probability         	|     Prediction	        					| 
 |:---------------------:|:---------------------------------------------:|
 |1.0 | Stop|
-|7.91101303414131e-31 | Road work|
-|7.959577602442434e-36 | No vehicles|
-|7.546735434253067e-36 | Yield|
+|3.865269657252509e-38 | No entry|
 |0.0 | Speed limit (20km/h)|
+|0.0 | Speed limit (30km/h)|
+|0.0 | Speed limit (50km/h)|
 
 
-The probability table for the sixth image
+The probability table for the sixth image. Again a very strong prediction.
 
 | Probability         	|     Prediction	        					| 
 |:---------------------:|:---------------------------------------------:|
 |1.0 | No entry|
-|3.745169307777113e-19 | Stop|
-|2.349077576631819e-23 | No passing|
-|6.099569277889269e-26 | Yield|
-|1.0714994060585995e-27 | Bicycles crossing|
+|3.3218304154487527e-22 | Stop|
+|1.8324859188973467e-25 | Speed limit (20km/h)|
+|2.4975147518162684e-27 | Traffic signals|
+|2.142295548829814e-32 | Speed limit (30km/h)|
 
 
-The probability table for the seventh image, the speed limit covered by the leaves.
+The probability table for the seventh image, the speed limit covered by the leaves. Very strong prediction of the wrong sign.
 
 | Probability         	|     Prediction	        					| 
 |:---------------------:|:---------------------------------------------:|
-|0.98102205991745 | Speed limit (30km/h)|
-|0.016811365261673927 | Speed limit (50km/h)|
-|0.0005423730472102761 | Speed limit (60km/h)|
-|0.0004377235600259155 | Speed limit (80km/h)|
-|0.00032083169207908213 | End of speed limit (80km/h)|
+|0.9998708963394165 | Speed limit (30km/h)|
+|0.00012913758109789342 | Speed limit (50km/h)|
+|4.2130361699310725e-11 | Speed limit (70km/h)|
+|3.158543565584537e-11 | Speed limit (80km/h)|
+|2.3920100275520717e-11 | Wild animals crossing|
 
+The probability table for the eight image, rotated priority road. The correct sign is not even in the top five. The first one is not that strong as the other ones 84% vs (>99%), however it is still very strong.
 
+| Probability         	|     Prediction	        					| 
+|:---------------------:|:---------------------------------------------:|
+|0.8428881764411926 | Right-of-way at the next intersection|
+|0.12577833235263824 | Double curve|
+|0.01558246836066246 | Beware of ice/snow|
+|0.01530691422522068 | Speed limit (100km/h)|
+|0.00021830871992278844 | End of speed limit (80km/h)|
 
+The probability table for the nineth image, blurred road work. It seems the blur did not change much because probability was almost 100%. Possibly because it does not matter when the sign is resized to 32x32 pixels.
+
+| Probability         	|     Prediction	        					| 
+|:---------------------:|:---------------------------------------------:|
+|1.0 | Road work|
+|4.477609418223477e-13 | Dangerous curve to the right|
+|3.4141877930241645e-15 | Right-of-way at the next intersection|
+|3.3904443792147465e-18 | Pedestrians|
+|2.1752495230338266e-19 | General caution|
+
+The probability table for the tenth image, the off screen yield sign. Agian a very strong result (99.998%) for the incorrect sign.
+
+| Probability         	|     Prediction	        					| 
+|:---------------------:|:---------------------------------------------:|
+|0.9999781847000122 | Priority road|
+|2.183889228035696e-05 | Traffic signals|
+|7.858788286796425e-09 | Stop|
+|5.149075388288793e-09 | No vehicles|
+|3.565769235436278e-09 | Yield|
